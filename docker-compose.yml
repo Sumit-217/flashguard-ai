@@ -1,0 +1,5 @@
+# FlashGuard AI - Docker Compose Configuration Placeholder
+# Note: Docker services (PostgreSQL + PostGIS, Eclipse Mosquitto MQTT, FastAPI Backend, etc.)
+# will be defined and configured during the implementation stages (Stage 1+).
+
+services: {}
