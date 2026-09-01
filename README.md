@@ -107,9 +107,11 @@ flashguard-ai/
 
 ## 📋 Current Development Stage
 
-> **FlashGuard AI is currently in Stage 0 — Project Setup.**
+> **✅ Stage 0 — Project Setup & Standardization is COMPLETE.**
 
-*Note: Application features, models, databases, and services are in setup and planning phase; implementation begins in subsequent stages according to the project roadmap.*
+We have established the monorepo, tech stack, data contracts, environment specifications, and coding standards. Application development will begin in the next stages.
+
+*See [PROGRESS.md](PROGRESS.md) for a detailed breakdown of completed milestones.*
 
 ---
 
