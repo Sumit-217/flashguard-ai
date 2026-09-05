@@ -5,27 +5,27 @@
 
 ---
 
-## 📌 Project Overview
+## 📌 Project Overview & SIH 2026 Context
 
-**FlashGuard AI** is a location-aware, communication-resilient emergency platform engineered to address catastrophic natural hazards in mountainous terrain—particularly flash floods, cloudbursts, and landslides across Uttarakhand.
+**FlashGuard AI** is a location-aware, communication-resilient emergency platform engineered for the **Smart India Hackathon (SIH) 2026**. It focuses on the high-risk Himalayan disaster corridor across Uttarakhand, where cloudbursts, torrential precipitation, flash floods, and landslides present severe threats to mountainous communities, pilgrimage corridors, and critical infrastructure.
 
-The platform bridges real-time government telemetry, in-process explainable AI risk assessment, multi-window precipitation analysis, and geospatial visualization to provide field responders, district administrators, and citizens with actionable disaster intelligence.
+The platform bridges real-time government telemetry, in-process explainable risk modeling, multi-window precipitation accumulation analysis, and geospatial visualization to provide field emergency responders, district coordinators, and citizens with rapid, actionable disaster intelligence.
 
 ---
 
 ## 🏔️ Problem Statement & Proposed Solution
 
 ### The Challenge
-The Himalayan disaster corridor in Uttarakhand experiences rapid, localized weather anomalies such as torrential cloudbursts and flash floods (e.g., Kedarnath 2013, Chamoli 2021). Conventional disaster response systems suffer from:
-1. **Siloed Telemetry**: Government sensor data is often dispersed across complex portals without automated ingestion into early warning pipelines.
-2. **Delayed Risk Interpretation**: Raw millimeter rainfall readings lack contextualized, multi-window accumulation scoring (hourly, 6h, 24h) and explainable threat levels.
-3. **Communication Vulnerability**: Mountainous terrain suffers frequent cellular network outages during severe events, leaving affected communities isolated.
+The Himalayan disaster corridor in Uttarakhand experiences rapid, localized weather anomalies (e.g., Kedarnath 2013, Chamoli 2021). Conventional disaster response workflows suffer from:
+1. **Siloed Telemetry**: Government sensor data is often dispersed across administrative portals without automated ingestion into early warning pipelines.
+2. **Delayed Risk Interpretation**: Raw millimeter rainfall measurements lack contextualized, multi-window accumulation scoring (hourly, 6h, 24h) and explainable threat classifications.
+3. **Communication Vulnerability**: Mountainous terrain suffers frequent cellular network degradation and outages during severe storms, leaving affected communities isolated.
 
 ### The FlashGuard AI Solution
-* **Automated Government Telemetry**: Direct, automated ingestion of hourly rainfall telemetry from the National Water Data Portal (NWDP / NWIC, Ministry of Jal Shakti).
+* **Automated Government Telemetry**: Direct ingestion of hourly rainfall telemetry from the National Water Data Portal (NWDP / NWIC, Ministry of Jal Shakti).
 * **Explainable Multi-Tiered Risk Engine**: In-process risk calculations classifying hazards into `LOW`, `MODERATE`, `HIGH`, and `CRITICAL` with human-readable rationale.
-* **Geospatial Map Layers**: Dynamic RFC 7946 GeoJSON generation with coordinates formatted in strict `[longitude, latitude]` Point geometry for mobile and web maps.
-* **Resilient Architecture**: Multi-layer fallback mechanisms including in-memory caching with TTL, stale-cache retention for upstream outages, and deterministic presentation demo modes.
+* **Geospatial Map Layers**: Dynamic RFC 7946 GeoJSON generation with coordinates formatted in strict `[longitude, latitude]` Point geometry for mobile and web map overlays.
+* **Multi-Layer Resilience**: In-memory caching with TTL, stale-cache retention for upstream outages, and deterministic presentation demo modes.
 
 ---
 
@@ -47,7 +47,7 @@ To maintain engineering transparency, project capabilities are strictly categori
 * **Machine Learning Forecasting**: Time-series predictive rainfall forecasting models (LSTM / XGBoost).
 * **Spatial Database (PostGIS)**: Persistent storage of historical hazard polygons, evacuation routes, and safe shelter points.
 * **Hazard-Avoidance Routing**: OSRM-based evacuation path calculation actively penalizing paths through `HIGH` and `CRITICAL` hazard zones.
-* **Edge IoT Telemetry**: Physical ESP32 hardware and MQTT broker consumer daemon ingesting real-time river water levels.
+* **Edge IoT Telemetry**: Physical ESP32 hardware and MQTT broker consumer daemon ingesting real-time river water levels into PostGIS.
 * **Multi-Channel Alert Broadcasts**: Automated Firebase Cloud Messaging (FCM) push alerts, SMS gateway integration for keypad phones, and peer-to-peer (P2P) Wi-Fi Direct mesh propagation.
 * **Enterprise Security**: JWT authentication, API keys, and rate limiting.
 
@@ -144,7 +144,6 @@ flashguard-ai/
 ├── iot/                        # ESP32 firmware, MQTT broker config & sensor simulator
 ├── maps/                       # Geospatial data extracts and routing scripts
 ├── scripts/                    # Developer setup and automation scripts
-├── .env.example                # Safe environment configuration template
 ├── pyproject.toml              # Ruff and Pytest project configuration
 ├── render.yaml                 # Render infrastructure-as-code specification
 └── requirements.txt            # Python dependencies for local setup & Render build
@@ -202,12 +201,55 @@ Observations are sorted chronologically to evaluate multi-window precipitation a
 
 ---
 
+## 📱 Subsystem Status (Mobile, Admin, Maps & IoT)
+
+### Flutter Mobile Client (`android/`)
+* **Current Status**: Scaffolding complete with defined Dio API contract consuming `/api/v1/risk/uttarakhand`, `/api/v1/risk/uttarakhand/geojson`, `/api/v1/demo/risk/uttarakhand`, and `/api/v1/demo/risk-assessment`.
+* **Next Stage**: Riverpod state management and Drift (SQLite) offline cache implementation for persistent offline shelter and hazard lookup.
+
+### Admin Monitoring Dashboard (`dashboard/`)
+* **Current Status**: React + Vite + TypeScript project scaffold with Leaflet map container.
+* **Next Stage**: Rendering live GeoJSON risk layers from `/api/v1/risk/uttarakhand/geojson` and district telemetry summaries.
+
+### Maps & Geospatial Routing (`maps/`)
+* **Current Status**: RFC 7946 GeoJSON Point feature generator implemented and active in `ai/src/risk/aggregation.py`. Coordinates strictly follow `[longitude, latitude]` order.
+* **Next Stage**: OpenStreetMap (OSM) extract ingestion and OSRM graph profile penalizing routes through `HIGH` and `CRITICAL` hazard zones.
+
+### IoT & Environmental Sensing (`iot/`)
+* **Current Status**: Standardized MQTT topic contract (`flashguard/sensors/{sensor_id}/readings`) and payload structure defined.
+* **Next Stage**: Background MQTT consumer daemon in the backend ingesting sensor readings into PostGIS.
+
+---
+
 ## 🔒 Security Posture & CORS
 
 * **CORS Whitelist**: Controlled browser origins are configured via `ALLOWED_ORIGINS` (comma-separated list).
 * **Restricted Methods & Headers**: Limited strictly to `GET` and `POST` methods, and `Content-Type` and `Authorization` headers.
 * **Credentials**: Disabled (`allow_credentials=False`).
 * **Mobile Compatibility**: Native Flutter apps communicate directly without browser CORS constraints.
+* **Authentication Note**: Authentication (JWT / API Keys) and rate limiting are planned for the production hardening phase and are **not active in the current prototype**.
+
+---
+
+## ⚙️ Environment Configuration & Variables
+
+All settings load from environment variables with safe internal defaults:
+
+| Variable | Default Value | Purpose |
+| :--- | :--- | :--- |
+| `ALLOWED_ORIGINS` | `""` (empty) | Comma-separated list of allowed browser origins (e.g. `http://localhost:5173`). |
+| `NWDP_BASE_URL` | `https://nwdp.nwic.gov.in` | Government datastore root URL. |
+| `NWDP_RESOURCE_ID` | `8b406187-0fee-40b9-8cd9-a249e0ce1903` | NWDP hourly telemetry dataset ID. |
+| `NWDP_PAGE_SIZE` | `100` | Ingestion pagination batch limit. |
+| `NWDP_TIMEOUT_SECONDS` | `30.0` | Upstream HTTP request timeout. |
+| `CACHE_TTL_SECONDS` | `300` | In-memory telemetry cache lifetime (seconds). |
+| `RAINFALL_MODERATE_MM` | `25.0` | Hourly rainfall moderate threshold (mm). |
+| `RAINFALL_HIGH_MM` | `50.0` | Hourly rainfall high threshold (mm). |
+| `RAINFALL_CRITICAL_MM` | `80.0` | Hourly rainfall critical torrential threshold (mm). |
+| `RAINFALL_6H_ELEVATED_MM` | `50.0` | 6-hour accumulation elevated threshold (mm). |
+| `RAINFALL_6H_SEVERE_MM` | `100.0` | 6-hour accumulation severe threshold (mm). |
+| `RAINFALL_24H_ELEVATED_MM` | `75.0` | 24-hour accumulation elevated threshold (mm). |
+| `RAINFALL_24H_SEVERE_MM` | `150.0` | 24-hour accumulation severe threshold (mm). |
 
 ---
 
@@ -217,24 +259,19 @@ Observations are sorted chronologically to evaluate multi-window precipitation a
 * Python 3.11+ (Python 3.11 and 3.13 tested and verified)
 * Git
 
-### 2. Environment Configuration
-Copy the template configuration:
-```bash
-cp .env.example .env
-```
-Configure `ALLOWED_ORIGINS` or threshold overrides in `.env` as required.
-
-### 3. Install Dependencies
+### 2. Install Dependencies
+From the repository root:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Backend Server
+### 3. Run the Backend Server
 ```bash
 uvicorn backend.app.main:app --reload --port 8000
 ```
 Interactive endpoints:
 * **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+* **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 * **Health Check**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
 
 ---
@@ -255,13 +292,31 @@ ruff check .
 
 ## ☁️ Render Deployment
 
-The backend is configured for automated cloud deployment via [`render.yaml`](render.yaml):
+The backend web service is prepared for automated cloud deployment via [`render.yaml`](render.yaml):
 
 * **Service Name**: `flashguard-backend`
 * **Runtime**: Python `3.11.9`
 * **Build Command**: `pip install -r requirements.txt`
 * **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
 * **Health Check Path**: `/health`
+* **Status**: Deployment configuration is prepared and validated.
+
+---
+
+## ⏳ Current Limitations & Future Roadmap
+
+### Current Limitations
+1. **Prototype Thresholds**: Rainfall thresholds and scores are heuristic demonstration rules and not calibrated against official IMD/CWC warning declarations.
+2. **In-Memory Cache**: Telemetry is cached in-memory on the single application process rather than a distributed Redis cache.
+3. **Absence of Persistent Storage**: Risk assessments are computed dynamically in-process; historical observations are not yet stored in a persistent spatial database.
+4. **Internet Dependency for Live Feed**: Live telemetry ingestion requires internet connectivity to reach the NWDP CKAN datastore (mitigated by deterministic demo fallback and in-memory cache).
+
+### Future Roadmap
+1. **Machine Learning Forecasting**: Integrating time-series deep learning models (LSTM) to predict rainfall 3–6 hours in advance.
+2. **Spatial Database Integration**: Connecting PostgreSQL + PostGIS for persistent hazard polygons and safe shelters.
+3. **Hazard-Avoidance Evacuation Routing**: Intersecting OSRM route polylines with high-risk polygons to return safe evacuation paths.
+4. **Hardware Telemetry Integration**: Deploying physical ESP32 water-level sensors and streaming telemetry over MQTT.
+5. **Resilient Communication**: Implementing P2P Wi-Fi Direct mesh networking and SMS gateway failover for off-grid operation.
 
 ---
 
