@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: flashguard-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: NWDP_BASE_URL
+        value: "https://nwdp.nwic.gov.in"
+      - key: NWDP_RESOURCE_ID
+        value: "8b406187-0fee-40b9-8cd9-a249e0ce1903"
+      - key: NWDP_PAGE_SIZE
+        value: "100"
+      - key: NWDP_TIMEOUT_SECONDS
+        value: "30"
+      - key: CACHE_TTL_SECONDS
+        value: "300"
