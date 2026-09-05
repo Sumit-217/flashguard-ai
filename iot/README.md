@@ -1,13 +1,46 @@
-# IoT & Sensor Simulation
+# FlashGuard AI — IoT Telemetry & Environmental Sensing
 
-This directory contains IoT firmware, MQTT broker configurations, and the Python-based IoT sensor simulator for FlashGuard AI.
+> **Hardware telemetry, MQTT broker configurations, and sensor simulation for FlashGuard AI (SIH 2026).**  
+> Built with **ESP32**, **Eclipse Mosquitto (MQTT)**, and **Python**.
 
-## Structure
-- `esp32/` - ESP32 microcontroller firmware and sensor drivers (C++ / Arduino / ESP-IDF).
-- `simulator/` - Python-based simulated sensor data stream (water level, rainfall, soil moisture).
-- `mqtt/` - MQTT topics, client configurations, and broker setup (Eclipse Mosquitto).
+---
 
-## Technology
-- ESP32, MQTT (paho-mqtt), Python simulator.
+## 📌 Overview
 
-> **Note**: Firmware, simulator scripts, and MQTT topics will be implemented during Stage 5.
+The `iot/` directory contains firmware drivers and simulation scripts for edge environmental monitoring. In the event of sudden river surges or flash floods in Himalayan valleys (e.g. Alaknanda, Mandakini), IoT sensor nodes publish telemetry directly to the FlashGuard platform.
+
+---
+
+## 📂 Directory Structure
+
+```text
+iot/
+├── esp32/       # C++ / Arduino firmware for ESP32 microcontrollers
+├── simulator/   # Python fallback simulator publishing realistic sensor telemetry
+├── mqtt/        # Mosquitto broker configuration, ACLs, and topics
+└── README.md
+```
+
+---
+
+## 📡 MQTT Topic Hierarchy
+
+All sensor telemetry follows the standardized MQTT topic contract:
+
+```text
+flashguard/sensors/{sensor_id}/readings
+```
+
+### Standard Payload Format (JSON)
+```json
+{
+  "sensor_id": "ESP32_JOSHIMATH_01",
+  "location": "Joshimath",
+  "metric": "water_level",
+  "unit": "cm",
+  "value": 142.5,
+  "timestamp": "2026-09-06T01:00:00Z"
+}
+```
+
+The FastAPI backend runs an MQTT consumer daemon that ingests these readings into PostgreSQL, checks critical thresholds, and feeds the real-time AI risk evaluation pipeline.

@@ -1,12 +1,35 @@
 # FlashGuard AI Documentation
 
-This directory contains technical architecture documentation, API specifications, database schemas, setup guides, and architectural decision records (ADRs).
+This directory contains technical architecture documentation, API specifications, database schemas, setup guides, architectural decision records (ADRs), and demo milestone contracts for **FlashGuard AI (SIH 2026)**.
 
-## Structure
-- `architecture/` - High-level system architecture diagrams and flow specifications.
-- `api/` - REST API contracts and OpenAPI schemas.
-- `database/` - PostgreSQL + PostGIS schemas, migration plans, and entity relationship diagrams.
-- `setup/` - Developer environment and deployment setup instructions.
-- `decisions/` - Architectural Decision Records (ADRs).
+---
 
-> **Note**: Detailed documentation files will be created as part of Stage 1 (Core Architecture & Interfaces).
+## 📂 Documentation Directory Structure
+
+```text
+docs/
+├── architecture/         # High-level system architecture and interaction flows
+│   ├── communication-flow.md
+│   ├── data-flow.md
+│   └── system-interfaces.md
+├── api/                  # Overarching production REST API specifications
+│   └── api-contract.md
+├── database/             # PostgreSQL + PostGIS schemas and entity relationship models
+├── demo/                 # Milestone-specific demonstration contracts
+│   └── api-contract.md   # Monday Director Demo contract (Uttarakhand focus)
+├── setup/                # Developer setup, conventions, and environment guides
+│   ├── coding-standards.md
+│   ├── development-environment.md
+│   └── git-workflow.md
+└── decisions/            # Architectural Decision Records (ADRs)
+    └── 005-data-contracts.md
+```
+
+---
+
+## 📌 Key Documents
+
+* **[Demo API Contract](demo/api-contract.md)**: Frozen data contract for the Monday Director Demo, targeting Uttarakhand (Joshimath, Kedarnath, Dharasu, Rishikesh).
+* **[System Interfaces & Boundaries](architecture/system-interfaces.md)**: Specifications for how Flutter, FastAPI, AI Risk Engine, PostGIS, MQTT, and Admin Dashboard communicate.
+* **[Coding Standards](setup/coding-standards.md)**: Strict code styling rules (PEP 8 / Ruff, Dart format, ESLint), testing mandates, and geospatial standards.
+* **[Git & PR Workflow](setup/git-workflow.md)**: Monorepo branching strategies and PR checklists.

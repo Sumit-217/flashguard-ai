@@ -1,5 +1,18 @@
-# Utility & Development Scripts
+# FlashGuard AI — Development & Automation Scripts
 
-This directory contains shared development, setup, and deployment scripts for the FlashGuard AI monorepo.
+> **Shared developer utilities, data preprocessing, and setup automation for SIH 2026.**
 
-> **Note**: Utility scripts will be added here during development.
+---
+
+## 📌 Available Scripts & Tasks
+
+This directory contains cross-module helper scripts to accelerate local development and testing:
+
+* **Setup & Verification**:
+  - Validates environment variables from `.env.example`.
+  - Verifies local Docker database and Mosquitto connectivity.
+* **Geospatial & Seed Scripts**:
+  - Seeds Uttarakhand administrative district boundaries and shelter points into PostGIS.
+  - Generates initial test polygons for Chamoli, Rudraprayag, and Dehradun.
+* **IoT Simulation**:
+  - Fallback testing scripts generating continuous water-level readings over MQTT.
