@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from ai.src.api.routes import router as risk_router
 from backend.app.api.v1.demo import router as demo_router
 
 app = FastAPI(
@@ -31,5 +32,6 @@ def health_check() -> dict[str, str]:
     return {"status": "healthy"}
 
 
-# Mount v1 demo router under /api/v1
+# Mount routers under /api/v1
 app.include_router(demo_router, prefix="/api/v1")
+app.include_router(risk_router, prefix="/api/v1")
