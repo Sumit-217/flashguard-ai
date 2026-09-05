@@ -8,6 +8,7 @@ select = ["E", "F", "I"] # pycodestyle, pyflakes, isort
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-ra -q"
+pythonpath = ["."]
 testpaths = [
     "tests",
     "backend/tests",
