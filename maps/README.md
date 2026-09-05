@@ -7,11 +7,11 @@
 
 ## 📌 Overview
 
-The `maps/` module handles all spatial data preparation, hazard polygon buffering, and safe evacuation path calculation for FlashGuard AI.
+The `maps/` module handles spatial data preparation, hazard polygon buffering, and safe evacuation path calculation for FlashGuard AI.
 
 ### Target Geography: Uttarakhand, India
-- Coordinate Reference System: strictly **WGS84 (`EPSG:4326`)**
-- Coordinate ordering: strictly **`[longitude, latitude]`** in GeoJSON payloads and **`latitude`**, **`longitude`** in REST objects.
+* Coordinate Reference System: strictly **WGS84 (`EPSG:4326`)**
+* Coordinate ordering: strictly **`[longitude, latitude]`** in GeoJSON payloads and **`latitude`**, **`longitude`** in REST objects.
 
 ---
 
@@ -28,9 +28,14 @@ maps/
 
 ---
 
-## 🛣️ Safe Evacuation Routing Algorithm (Member 3)
+## 🗺️ Geospatial & Routing Architecture
 
-1. Backend requests candidate routes from Origin to Destination via OSRM.
-2. Candidate route polylines are spatially intersected with active PostGIS `RiskZone` hazard polygons (derived from AI risk scores).
-3. The routing engine applies dynamic penalties to paths intersecting `HIGH` or `CRITICAL` hazard zones.
-4. The safest alternative path avoiding active danger zones is returned to the mobile client as GeoJSON.
+### 1. Active Implementation
+* **GeoJSON Generation**: The backend actively generates RFC 7946 `FeatureCollection` payloads at `GET /api/v1/risk/uttarakhand/geojson`.
+* **Coordinate Standards**: Point coordinates are formatted strictly as `[longitude, latitude]` for direct rendering on Flutter and Leaflet map clients.
+
+### 2. Planned / Future Scope (Safe Evacuation Routing)
+* Candidate routes between origin and destination requested via an OSRM backend instance.
+* Route polylines spatially intersected against active PostGIS `RiskZone` polygons derived from the AI risk engine.
+* Dynamic penalty scoring applied to segments crossing `HIGH` or `CRITICAL` hazard zones.
+* Safest alternative route avoiding danger zones returned to the mobile app.

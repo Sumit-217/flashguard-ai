@@ -4,15 +4,16 @@
 
 ---
 
-## 📌 Available Scripts & Tasks
+## 📌 Development Utilities & Automation Scope
 
-This directory contains cross-module helper scripts to accelerate local development and testing:
+This directory is designated for cross-module helper scripts to accelerate local development, automated testing, and CI/CD pipelines:
 
+### Planned Helper Scripts
 * **Setup & Verification**:
-  - Validates environment variables from `.env.example`.
-  - Verifies local Docker database and Mosquitto connectivity.
-* **Geospatial & Seed Scripts**:
-  - Seeds Uttarakhand administrative district boundaries and shelter points into PostGIS.
-  - Generates initial test polygons for Chamoli, Rudraprayag, and Dehradun.
-* **IoT Simulation**:
-  - Fallback testing scripts generating continuous water-level readings over MQTT.
+  - Environment variable validation against `.env.example`.
+  - Upstream connectivity tests for NWDP CKAN API and Render endpoints.
+* **Geospatial Seeding**:
+  - Administrative boundary loaders for Uttarakhand districts into PostGIS.
+  - Demonstration hazard polygon generators for Chamoli, Rudraprayag, and Dehradun.
+* **Telemetry Emulation**:
+  - Offline testing scripts emulating continuous water-level readings over MQTT.

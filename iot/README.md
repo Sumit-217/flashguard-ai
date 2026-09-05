@@ -7,7 +7,7 @@
 
 ## 📌 Overview
 
-The `iot/` directory contains firmware drivers and simulation scripts for edge environmental monitoring. In the event of sudden river surges or flash floods in Himalayan valleys (e.g. Alaknanda, Mandakini), IoT sensor nodes publish telemetry directly to the FlashGuard platform.
+The `iot/` directory contains firmware specifications and simulation scripts for edge environmental monitoring. In the event of sudden river surges or flash floods in Himalayan valleys (e.g. Alaknanda, Mandakini rivers in Uttarakhand), IoT sensor nodes publish telemetry directly to the FlashGuard platform.
 
 ---
 
@@ -43,4 +43,6 @@ flashguard/sensors/{sensor_id}/readings
 }
 ```
 
-The FastAPI backend runs an MQTT consumer daemon that ingests these readings into PostgreSQL, checks critical thresholds, and feeds the real-time AI risk evaluation pipeline.
+### Integration Status
+* **Implemented**: Payload schemas, topic hierarchies, and directory structures.
+* **Planned (Future Scope)**: Running MQTT consumer daemon within the backend to ingest readings into PostgreSQL/PostGIS, check critical river thresholds, and stream updates into the real-time AI risk evaluation pipeline.
