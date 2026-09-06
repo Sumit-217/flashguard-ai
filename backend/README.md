@@ -34,15 +34,19 @@ backend/
 │   │   ├── __init__.py
 │   │   └── v1/
 │   │       ├── __init__.py
-│   │       └── demo.py          # Director Demo endpoints (Joshimath evaluation)
+│   │       └── demo.py          # Director Demo endpoints (Joshimath evaluation & SMS alerts)
 │   ├── schemas/
 │   │   ├── __init__.py
+│   │   ├── alert.py             # Pydantic v2 validation models for emergency SMS alerts
 │   │   └── risk.py              # Pydantic v2 validation models for demo requests/responses
 │   └── services/
 │       ├── __init__.py
-│       └── risk_service.py      # Bridge service invoking ai/src/risk_engine.py
+│       ├── alert_service.py     # Emergency message generation and SMS dispatch service
+│       ├── risk_service.py      # Bridge service invoking ai/src/risk_engine.py
+│       └── sms_provider.py      # Pluggable SMS provider abstraction and DemoSMSProvider
 ├── tests/
 │   ├── __init__.py
+│   ├── test_alert.py            # Unit and API integration tests for SMS alerts
 │   └── test_demo_api.py         # Integration test suite for backend routes
 ├── requirements.txt             # Service dependency definitions
 └── README.md
@@ -59,12 +63,26 @@ All application routes are documented below and verified against the current cod
 | `GET` | `/health` | `backend.app.main` | Primary service health status check (used by Render). |
 | `GET` | `/api/v1/health` | `ai.src.api.routes` | Health status check for telemetry sub-router. |
 | `POST` | `/api/v1/demo/risk-assessment` | `backend.app.api.v1.demo` | Director Demo contract: evaluates composite risk for target locations (Joshimath). |
+| `POST` | `/api/v1/demo/send-alert` | `backend.app.api.v1.demo` | Emergency SMS Alert Demonstration: generates and dispatches alert payload for keypad phones. |
 | `GET` | `/api/v1/rainfall/uttarakhand` | `ai.src.api.routes` | Government NWDP telemetry summary, active districts, and station counts. |
 | `GET` | `/api/v1/risk/uttarakhand` | `ai.src.api.routes` | State-wide composite risk profile across all reporting Uttarakhand districts. |
 | `GET` | `/api/v1/risk/district/{district}` | `ai.src.api.routes` | District-specific telemetry metrics and station risk breakdowns. |
 | `GET` | `/api/v1/risk/station/{station}` | `ai.src.api.routes` | Station-level rainfall accumulation (hourly, 6h, 24h) and explainable reasons. |
 | `GET` | `/api/v1/risk/uttarakhand/geojson` | `ai.src.api.routes` | RFC 7946 GeoJSON FeatureCollection in strict `[longitude, latitude]` Point coordinates. |
 | `GET` | `/api/v1/demo/risk/uttarakhand` | `ai.src.api.routes` | Deterministic demo fallback dataset exercising all 4 risk tiers (`LOW` to `CRITICAL`). |
+
+### 📱 Emergency SMS Alert Demonstration (Keypad Phone Support)
+
+To address real-world disaster scenarios where cellular data / internet connectivity is lost, FlashGuard AI supports emergency alerting over standard cellular SMS, reaching individuals on basic feature and keypad phones:
+
+* **Endpoint**: `POST /api/v1/demo/send-alert`
+* **Operational Mode**: Currently operates in `SMS_DEMO` mode (`delivery_mode: "SMS_DEMO"`).
+* **Key Features**:
+  - **Single GSM Segment**: Generates concise alerts (<= 160 characters) guaranteed to display cleanly on basic keypad phones.
+  - **Privacy First**: Raw phone numbers are never stored, logged, or retained. Responses only return masked representations (e.g. `******3210`).
+  - **Pluggable Architecture**: Implemented via a `BaseSMSProvider` abstraction (`DemoSMSProvider` default). A live SMS gateway (Twilio, AWS SNS, local GSM modem, or CDAC emergency broadcast) can be plugged in without changing API contracts.
+  - **Keypad Phone Verification**: A basic keypad phone can be used as the demonstration recipient when an actual SMS provider / SIM gateway is connected.
+
 
 ---
 
