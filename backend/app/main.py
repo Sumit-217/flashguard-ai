@@ -1,4 +1,5 @@
 """FlashGuard AI — Main FastAPI Application Entrypoint."""
+
 import os
 
 from fastapi import FastAPI

@@ -39,4 +39,3 @@ def send_emergency_alert(
 ) -> SMSAlertResponse:
     """Validate request and dispatch emergency SMS alert in demo mode."""
     return send_alert(request)
-

@@ -18,4 +18,3 @@ __all__ = [
     "send_alert",
     "send_sms_alert",
 ]
-

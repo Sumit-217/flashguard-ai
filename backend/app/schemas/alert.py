@@ -1,11 +1,9 @@
-```python
 """Pydantic schemas for the FlashGuard AI alert broadcast system."""
 
 from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
-
 
 AlertSeverity = Literal["LOW", "MODERATE", "HIGH", "CRITICAL"]
 NotificationChannel = Literal["FCM", "SMS", "PUSH"]
@@ -149,9 +147,7 @@ class SMSAlertRequest(BaseModel):
             )
 
         if not (10 <= len(cleaned) <= 15):
-            raise ValueError(
-                "Phone number length must be between 10 and 15 characters"
-            )
+            raise ValueError("Phone number length must be between 10 and 15 characters")
 
         return cleaned
 
@@ -193,4 +189,3 @@ class SMSAlertResponse(BaseModel):
             "Risk Score: 81. Evacuate to the nearest safe zone."
         ],
     )
-```

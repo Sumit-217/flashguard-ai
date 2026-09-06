@@ -32,6 +32,7 @@ This document defines the strict development standards for the **FlashGuard AI (
 ```python
 MAX_RISK_SCORE = 1.0
 
+
 class RiskAssessment:
     def calculate_risk_score(self, water_level: float) -> float:
         pass
