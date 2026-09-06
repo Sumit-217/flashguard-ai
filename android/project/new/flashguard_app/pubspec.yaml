@@ -1,0 +1,61 @@
+name: flashguard_app
+description: >
+  FlashGuard — real-time flash flood, landslide and cloudburst risk monitor
+  for the Uttarakhand Himalayan corridor. Consumes the FlashGuard AI
+  telemetry/risk backend (NWDP-derived) and the user's live GPS position.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management — matches the /providers folder in the project layout.
+  provider: ^6.1.2
+
+  # Networking
+  http: ^1.2.2
+
+  # Live device GPS position
+  geolocator: ^13.0.1
+
+  # Online/offline detection, used to drive the offline fallback screen
+  connectivity_plus: ^6.1.0
+
+  # Local cache of the last-known-good risk snapshot for offline mode
+  shared_preferences: ^2.3.2
+
+  # Encrypted on-device storage for the user's profile (name/phone/Aadhaar).
+  # Used instead of shared_preferences for this data since it includes a
+  # government ID number.
+  flutter_secure_storage: ^9.2.2
+
+  # Date/time formatting for "observed at" / "last synced" timestamps
+  intl: ^0.19.0
+
+  # Deep-links out to a maps app for turn-by-turn directions to a safer zone
+  url_launcher: ^6.3.1
+
+  # Pannable OpenStreetMap view for the RISK MAP tab (pin + red/orange/
+  # yellow/green risk-zone overlay + nearby safe places). No API key
+  # needed, unlike Google Maps.
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # Typography — deliberately not default Material/Roboto. A monospace face
+  # is used for numeric risk readouts to give a dashboard/instrument feel
+  # rather than a generic rounded "AI app" look.
+  google_fonts: ^6.2.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
