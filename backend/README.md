@@ -34,10 +34,11 @@ backend/
 │   │   ├── __init__.py
 │   │   └── v1/
 │   │       ├── __init__.py
+│   │       ├── alerts.py        # Multi-channel disaster alerts & broadcast router (POST/GET /api/v1/alerts)
 │   │       └── demo.py          # Director Demo endpoints (Joshimath evaluation & SMS alerts)
 │   ├── schemas/
 │   │   ├── __init__.py
-│   │   ├── alert.py             # Pydantic v2 validation models for emergency SMS alerts
+│   │   ├── alert.py             # Pydantic v2 validation models for alerts (FCM, SMS, PUSH, DASHBOARD, etc.)
 │   │   └── risk.py              # Pydantic v2 validation models for demo requests/responses
 │   └── services/
 │       ├── __init__.py
@@ -62,6 +63,8 @@ All application routes are documented below and verified against the current cod
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | `backend.app.main` | Primary service health status check (used by Render). |
 | `GET` | `/api/v1/health` | `ai.src.api.routes` | Health status check for telemetry sub-router. |
+| `POST` | `/api/v1/alerts` | `backend.app.api.v1.alerts` | Broadcast a new emergency alert across specified channels (`FCM`, `SMS`, `PUSH`, `DASHBOARD`, etc.). |
+| `GET` | `/api/v1/alerts` | `backend.app.api.v1.alerts` | Retrieve all active disaster alerts. |
 | `POST` | `/api/v1/demo/risk-assessment` | `backend.app.api.v1.demo` | Director Demo contract: evaluates composite risk for target locations (Joshimath). |
 | `POST` | `/api/v1/demo/send-alert` | `backend.app.api.v1.demo` | Emergency SMS Alert Demonstration: generates and dispatches alert payload for keypad phones. |
 | `GET` | `/api/v1/rainfall/uttarakhand` | `ai.src.api.routes` | Government NWDP telemetry summary, active districts, and station counts. |
@@ -70,6 +73,12 @@ All application routes are documented below and verified against the current cod
 | `GET` | `/api/v1/risk/station/{station}` | `ai.src.api.routes` | Station-level rainfall accumulation (hourly, 6h, 24h) and explainable reasons. |
 | `GET` | `/api/v1/risk/uttarakhand/geojson` | `ai.src.api.routes` | RFC 7946 GeoJSON FeatureCollection in strict `[longitude, latitude]` Point coordinates. |
 | `GET` | `/api/v1/demo/risk/uttarakhand` | `ai.src.api.routes` | Deterministic demo fallback dataset exercising all 4 risk tiers (`LOW` to `CRITICAL`). |
+
+### 📢 Emergency Alerts & Multi-Channel Broadcast (`/api/v1/alerts`)
+
+* **Endpoint**: `POST /api/v1/alerts` and `GET /api/v1/alerts`
+* **Supported Channels**: `FCM`, `SMS`, `PUSH`, `DASHBOARD`, `CAP`, `WHATSAPP`, `SIREN`.
+* **Payload Highlights**: Supports severity levels (`LOW`, `MODERATE`, `HIGH`, `CRITICAL`), target districts, specific target zones/localities (`target_area`), geolocation (`latitude`, `longitude`), and custom warning text.
 
 ### 📱 Emergency SMS Alert Demonstration (Keypad Phone Support)
 
@@ -83,20 +92,15 @@ To address real-world disaster scenarios where cellular data / internet connecti
   - **Pluggable Architecture**: Implemented via a `BaseSMSProvider` abstraction (`DemoSMSProvider` default). A live SMS gateway (Twilio, AWS SNS, local GSM modem, or CDAC emergency broadcast) can be plugged in without changing API contracts.
   - **Keypad Phone Verification**: A basic keypad phone can be used as the demonstration recipient when an actual SMS provider / SIM gateway is connected.
 
-
 ---
 
 ## 🔒 Security Posture & CORS Configuration
 
-The backend implements controlled cross-origin access and strict request boundaries:
+The backend implements cross-origin access control:
 
-1. **Environment-Driven CORS (`ALLOWED_ORIGINS`)**:
-   - Allowed web origins are dynamically parsed from `os.getenv("ALLOWED_ORIGINS", "")`.
-   - If unset or empty, the allowed origins list is empty (no external web origins permitted).
-   - Configured via `CORSMiddleware`:
-     - `allow_credentials=False` (cookies and credentials disabled)
-     - `allow_methods=["GET", "POST"]` (restricted to read and evaluation actions)
-     - `allow_headers=["Content-Type", "Authorization"]`
+1. **Dashboard & Mobile Integration**:
+   - Configured via `CORSMiddleware` in `backend/app/main.py` allowing cross-origin requests from the React Admin Dashboard (`http://localhost:3000` / `http://localhost:5173` / deployed frontend) and mobile clients.
+   - `allow_credentials=False` (cookies and credentials disabled).
    - *Note*: Native mobile apps (Flutter) communicate directly via native networking and do not enforce browser CORS restrictions.
 2. **Current Limitations & Future Security Work**:
    - Authentication (JWT / API Keys) is **not yet implemented** in the current prototype.

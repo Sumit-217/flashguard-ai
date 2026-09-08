@@ -32,6 +32,10 @@ The mobile application provides individuals and field rescue teams with real-tim
 android/
 ├── pubspec.yaml                 # Flutter project configuration & dependencies
 ├── README.md                    # Mobile application documentation
+├── web/                         # Flutter Web runner & manifest configuration
+│   ├── index.html
+│   ├── manifest.json
+│   └── icons/
 ├── lib/
 │   ├── main.dart                # Application entrypoint
 │   ├── core/                    # App constants, networking, theme
@@ -53,7 +57,7 @@ android/
 ### 1. Generate Platform Boilerplate (If starting fresh)
 From within this `android/` folder:
 ```bash
-flutter create --platforms=android --org com.flashguard .
+flutter create --platforms=android,web --org com.flashguard .
 ```
 > **Note**: If prompted to overwrite `AndroidManifest.xml`, keep the provided file (`android/app/src/main/AndroidManifest.xml`) as it includes required `INTERNET`, `ACCESS_FINE_LOCATION`, and `ACCESS_COARSE_LOCATION` permissions.
 
@@ -62,10 +66,13 @@ flutter create --platforms=android --org com.flashguard .
 flutter pub get
 ```
 
-### 3. Connect to Backend
+### 3. Connect to Backend & Run
 Pass the backend base URL at runtime (or configure in `lib/core/constants/app_constants.dart`):
 
 ```bash
+# Web Browser (Chrome):
+flutter run -d chrome --dart-define=FLASHGUARD_API_BASE_URL=http://localhost:8000
+
 # Deployed Render Backend:
 flutter run --dart-define=FLASHGUARD_API_BASE_URL=https://flashguard-ai.onrender.com
 

@@ -3,14 +3,18 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 AlertSeverity = Literal["LOW", "MODERATE", "HIGH", "CRITICAL"]
-NotificationChannel = Literal["FCM", "SMS", "PUSH"]
+NotificationChannel = Literal[
+    "FCM", "SMS", "PUSH", "DASHBOARD", "CAP", "WHATSAPP", "SIREN"
+]
 
 
 class AlertCreateRequest(BaseModel):
     """Input payload for creating a new alert."""
+
+    model_config = ConfigDict(extra="ignore")
 
     severity: AlertSeverity = Field(
         ...,
@@ -33,6 +37,11 @@ class AlertCreateRequest(BaseModel):
         default_factory=lambda: ["FCM"],
         description="Notification channels to use.",
         examples=[["FCM", "SMS"]],
+    )
+    target_area: str | None = Field(
+        default=None,
+        description="Specific target zone or locality.",
+        examples=["Upper Catchment"],
     )
     latitude: float | None = Field(
         default=None,
@@ -72,6 +81,7 @@ class AlertResponse(BaseModel):
         default_factory=list,
         description="Channels selected for this alert.",
     )
+    target_area: str | None = Field(default=None)
     latitude: float | None = Field(default=None)
     longitude: float | None = Field(default=None)
     created_at: datetime = Field(

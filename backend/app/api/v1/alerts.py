@@ -24,6 +24,12 @@ _alerts: list[AlertResponse] = []
     summary="Create Alert",
     description="Broadcast a new emergency alert across specified channels.",
 )
+@router.post(
+    "/",
+    response_model=AlertResponse,
+    status_code=status.HTTP_201_CREATED,
+    include_in_schema=False,
+)
 def create_alert(payload: AlertCreateRequest) -> AlertResponse:
     """Create and broadcast a new disaster alert."""
     alert = AlertResponse(
@@ -32,6 +38,7 @@ def create_alert(payload: AlertCreateRequest) -> AlertResponse:
         district=payload.district,
         message=payload.message,
         channels=payload.channels,
+        target_area=payload.target_area,
         latitude=payload.latitude,
         longitude=payload.longitude,
         created_at=datetime.now(timezone.utc),
@@ -47,6 +54,12 @@ def create_alert(payload: AlertCreateRequest) -> AlertResponse:
     status_code=status.HTTP_200_OK,
     summary="List Alerts",
     description="Retrieve all active alerts.",
+)
+@router.get(
+    "/",
+    response_model=AlertListResponse,
+    status_code=status.HTTP_200_OK,
+    include_in_schema=False,
 )
 def list_alerts() -> AlertListResponse:
     """Retrieve list of active disaster alerts."""

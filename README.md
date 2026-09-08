@@ -39,9 +39,11 @@ To maintain engineering transparency, project capabilities are strictly categori
 * **Explainable Station Risk Model**: Real-time evaluation of hourly rate, 6-hour accumulation, and 24-hour accumulation with completeness metrics and reason logging.
 * **Hierarchical Aggregation**: Dynamic aggregation from Station $\to$ District $\to$ State, using worst-case severity escalation and dynamic station/district counts.
 * **GeoJSON Service**: Dynamic generation of RFC 7946 `FeatureCollection` layers for interactive mapping.
+* **Admin Monitoring Dashboard**: Full-featured React 19 + Vite 6 + Tailwind CSS v4 dashboard with interactive Leaflet risk map, multi-channel broadcast dispatch with keypad phone SMS preview, station inspection modals, and presentation demo modes.
+* **Disaster Alert & Broadcast Gateway**: Unified alerting endpoints (`POST /api/v1/alerts`, `GET /api/v1/alerts`, `POST /api/v1/demo/send-alert`) supporting FCM, SMS, Push, Dashboard, CAP, WhatsApp, and Siren channels.
 * **Unified FastAPI Gateway**: Consolidated backend at `backend.app.main:app` with CORS origin control, health endpoints, and automatic Swagger documentation.
 * **Director Demo Contracts**: Preserved weighted risk scoring endpoint (`POST /api/v1/demo/risk-assessment`) and deterministic multi-tier state fallback (`GET /api/v1/demo/risk/uttarakhand`).
-* **Test Suite**: 50 automated unit and integration tests passing across AI and backend modules.
+* **Test Suite**: 87 automated unit and integration tests passing across AI and backend modules.
 
 ### ⏳ PLANNED / FUTURE SCOPE (Target Production Architecture)
 * **Machine Learning Forecasting**: Time-series predictive rainfall forecasting models (LSTM / XGBoost).
@@ -105,8 +107,8 @@ To maintain engineering transparency, project capabilities are strictly categori
 | **Backend Service** | Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX | PostgreSQL, PostGIS, SQLAlchemy |
 | **AI / Risk Pipeline** | In-process Python heuristic risk model, time-series windows | LSTM / XGBoost forecasting, GeoPandas, Shapely |
 | **Government Data** | NWDP / NWIC CKAN Datastore API (Telemetry Hourly) | CWC River Gauges, IMD Radar API |
-| **Mobile Client** | Flutter (Dart) scaffolding, Dio client contracts | Drift (SQLite) offline cache, Riverpod, FCM |
-| **Admin Dashboard** | React, Vite, TypeScript, Leaflet scaffolding | Live telemetry websockets, incident dispatch |
+| **Mobile Client** | Flutter (Dart), Riverpod, Dio client contracts | Drift (SQLite) offline cache, FCM push alerts |
+| **Admin Dashboard** | React 19, Vite 6, TypeScript, Tailwind CSS v4, Leaflet | Live telemetry websockets, automated incident dispatch |
 | **Deployment** | Render (`render.yaml`), Docker definitions | Distributed cloud cluster |
 
 ---
@@ -124,15 +126,19 @@ flashguard-ai/
 │   │   ├── risk_engine.py      # Independent weighted calculation engine for demo
 │   │   └── schemas.py          # Pydantic v2 schemas for telemetry, risk, and GeoJSON
 │   └── tests/                  # 45 AI unit & integration tests
-├── android/                    # Flutter mobile application client
+├── android/                    # Flutter mobile application client (Android & Web)
 ├── backend/                    # Unified FastAPI backend application
 │   ├── app/
-│   │   ├── api/v1/demo.py      # Director Demo REST router (Joshimath evaluation)
-│   │   ├── schemas/risk.py     # Request/response schemas for demo contract
-│   │   ├── services/           # Risk service delegating to ai/src/risk_engine.py
-│   │   └── main.py             # Main entrypoint, CORS configuration & router mount
-│   └── tests/                  # 5 backend API integration tests
-├── dashboard/                  # React + Vite admin monitoring dashboard
+│   │   ├── api/v1/
+│   │   │   ├── alerts.py       # Multi-channel disaster alerts & broadcast router
+│   │   │   └── demo.py         # Director Demo REST router (Joshimath evaluation & SMS alerts)
+│   │   ├── schemas/
+│   │   │   ├── alert.py        # Pydantic models for multi-channel & SMS alerts
+│   │   │   └── risk.py         # Request/response schemas for demo contract
+│   │   ├── services/           # Alert dispatch and risk evaluation services
+│   │   └── main.py             # Main entrypoint, CORS configuration & router mounts
+│   └── tests/                  # 42 backend API & integration tests
+├── dashboard/                  # React 19 + Vite 6 + Tailwind CSS v4 admin monitoring dashboard
 ├── docker/                     # Container configurations and Dockerfile references
 ├── docs/                       # Specifications, architectural flows, and demo contracts
 │   ├── api/                    # API specifications
@@ -159,7 +165,10 @@ All endpoints are mounted and verified on the running FastAPI application:
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Primary service health status check (Render monitor). | Active |
 | `GET` | `/api/v1/health` | Sub-router health check endpoint. | Active |
+| `POST` | `/api/v1/alerts` | Broadcast emergency alert across specified channels (`FCM`, `SMS`, `PUSH`, `DASHBOARD`, etc.). | Active |
+| `GET` | `/api/v1/alerts` | Retrieve list of active disaster alerts. | Active |
 | `POST` | `/api/v1/demo/risk-assessment` | Director Demo: weighted multi-parameter disaster risk for Joshimath. | Active |
+| `POST` | `/api/v1/demo/send-alert` | Emergency SMS Alert: formatted for feature/keypad phones ($\le 160$ GSM chars). | Active |
 | `GET` | `/api/v1/rainfall/uttarakhand` | Summary of ingested NWDP telemetry, reporting districts, and station counts. | Active |
 | `GET` | `/api/v1/risk/uttarakhand` | State-wide composite risk profile with full district/station breakdown. | Active |
 | `GET` | `/api/v1/risk/district/{district}` | Administrative district risk profile (e.g. `Chamoli`, `Dehradun`). | Active |
@@ -204,12 +213,14 @@ Observations are sorted chronologically to evaluate multi-window precipitation a
 ## 📱 Subsystem Status (Mobile, Admin, Maps & IoT)
 
 ### Flutter Mobile Client (`android/`)
-* **Current Status**: Scaffolding complete with defined Dio API contract consuming `/api/v1/risk/uttarakhand`, `/api/v1/risk/uttarakhand/geojson`, `/api/v1/demo/risk/uttarakhand`, and `/api/v1/demo/risk-assessment`.
-* **Next Stage**: Riverpod state management and Drift (SQLite) offline cache implementation for persistent offline shelter and hazard lookup.
+* **Current Status**: Presentation and demonstration client implemented with Riverpod architecture, Dio API client, adaptive risk presentation, and multiplatform support (Android native and Web).
+* **Endpoints Consumed**: `/api/v1/risk/uttarakhand`, `/api/v1/risk/uttarakhand/geojson`, `/api/v1/alerts`, `/api/v1/demo/risk/uttarakhand`, and `/api/v1/demo/risk-assessment`.
+* **Next Stage**: Drift (SQLite) offline cache persistence for disconnected Himalayan valley operation and P2P Wi-Fi Direct mesh propagation.
 
 ### Admin Monitoring Dashboard (`dashboard/`)
-* **Current Status**: React + Vite + TypeScript project scaffold with Leaflet map container.
-* **Next Stage**: Rendering live GeoJSON risk layers from `/api/v1/risk/uttarakhand/geojson` and district telemetry summaries.
+* **Current Status**: Complete administrative monitoring dashboard built with React 19, Vite 6, TypeScript, Tailwind CSS v4, and Leaflet.
+* **Capabilities**: Interactive GeoJSON risk map with station inspect modals, live telemetry station directories, multi-channel emergency alert broadcaster with keypad phone SMS preview, system health telemetry sync monitor, and deterministic demo presentation scenarios.
+* **Next Stage**: Live WebSocket telemetry feeds and automated dispatch integration with state emergency operation centers.
 
 ### Maps & Geospatial Routing (`maps/`)
 * **Current Status**: RFC 7946 GeoJSON Point feature generator implemented and active in `ai/src/risk/aggregation.py`. Coordinates strictly follow `[longitude, latitude]` order.
@@ -223,10 +234,9 @@ Observations are sorted chronologically to evaluate multi-window precipitation a
 
 ## 🔒 Security Posture & CORS
 
-* **CORS Whitelist**: Controlled browser origins are configured via `ALLOWED_ORIGINS` (comma-separated list).
-* **Restricted Methods & Headers**: Limited strictly to `GET` and `POST` methods, and `Content-Type` and `Authorization` headers.
-* **Credentials**: Disabled (`allow_credentials=False`).
-* **Mobile Compatibility**: Native Flutter apps communicate directly without browser CORS constraints.
+* **CORS Integration**: Configured in `backend/app/main.py` allowing cross-origin requests from the React Admin Dashboard (`http://localhost:3000`, `http://localhost:5173`, etc.) and web clients.
+* **Mobile Compatibility**: Native Flutter apps communicate directly via native networking without browser CORS restrictions.
+* **Privacy by Design**: Masked telephone number formats in SMS payloads; no plaintext personal data persisted in demonstration endpoints.
 * **Authentication Note**: Authentication (JWT / API Keys) and rate limiting are planned for the production hardening phase and are **not active in the current prototype**.
 
 ---

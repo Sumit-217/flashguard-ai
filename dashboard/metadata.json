@@ -1,0 +1,6 @@
+{
+  "name": "FlashGuard AI Admin Dashboard",
+  "description": "Minimal, professional dark disaster-response command center and admin monitoring dashboard for Uttarakhand flash flood and risk assessment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
